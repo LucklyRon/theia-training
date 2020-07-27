@@ -1,6 +1,6 @@
 # Exercise 5: Implement a Language Server
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/akosyakov/theia-training/tree/exercise-5)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/Ron-ZL/theia-training/tree/exercise-5)
 
 In this exercise, you learn:
 - what is a language server protocol (LSP);
