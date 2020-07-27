@@ -1,73 +1,112 @@
-# theia-training
-The example of how to build the Theia-based applications with the theia-training.
+# Exercise 0: Build Theia Application
 
-## Getting started
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/Ron-ZL/theia-training/tree/exercise-0)
 
-Install [nvm](https://github.com/creationix/nvm#install-script).
+In this exercise, you learn:
+- the structure of a Theia extension project;
+- how to create a Theia application, build and run it;
+- how to configure a Theia extension with dependency injection.
 
-    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh | bash
+## Task 1: Scaffold the apllication
 
-Install npm and node.
+Install yo theia generator and run it:
+```
+npm install -g yo generator-theia-extension
+yo theia-extension theia-training
+```
 
-    nvm install 10
-    nvm use 10
+Select `Hello World` extension type.
 
-Install yarn.
+## Task 2: Build the application
 
-    npm install -g yarn
+Download dependencies and build all packages:
+```
+yarn
+```
 
-## Running the browser example
+## Task 3: Run the application
 
-    yarn rebuild:browser
-    cd browser-app
-    yarn start
+```
+cd browser-app
+yarn start --hostname 0.0.0.0 ..
+```
 
-Open http://localhost:3000 in the browser.
+Click `Open Browser` in the notification center.
 
-## Running the Electron example
+## Task 4: Rebuild incrementally
 
-    yarn rebuild:electron
-    cd electron-app
-    yarn start
+Compile the extension incrementally:
+```
+cd theia-training
+yarn watch
+```
 
-## Developing with the browser example
+Bundle the application incrementally:
+```
+cd browser-app
+yarn watch
+```
 
-Start watching of theia-training.
+- In `TheiaTrainingCommandContribution` change the greeting message.
+- Reload the page with a running application to apply new changes.
 
-    cd theia-training
-    yarn watch
+## Bonus
 
-Start watching of the browser example.
+### Task 5: Configure Gitpod workspace
 
-    yarn rebuild:browser
-    cd browser-app
-    yarn watch
+#### Create a fork
 
-Launch `Start Browser Backend` configuration from VS code.
+- View -> Find Command... (F1)
+- GitHub: Fork -> Fork to my account
 
-Open http://localhost:3000 in the browser.
+Gitpod will ask you to grant permission to be able to create forks and commit changes on your behalf.
 
-## Developing with the Electron example
+#### Commit generated code
 
-Start watching of theia-training.
+- View -> SCM
+- Enter a commit message.
+- In the SCM toolbar: `...` -> Stage All Changes
+- In the SCM toolbar click on the check icon to create a commit.
 
-    cd theia-training
-    yarn watch
+#### Configure .gitpod.yml
 
-Start watching of the electron example.
+##### Expose ports
 
-    yarn rebuild:electron
-    cd electron-app
-    yarn watch
+Add to .gitpod.yml:
+```
+ports:
+  - port: 3000
+```
 
-Launch `Start Electron Backend` configuration from VS code.
+See https://www.gitpod.io/docs/43_config_ports/
 
-## Publishing theia-training
+##### Configure tasks
 
-Create a npm user and login to the npm registry, [more on npm publishing](https://docs.npmjs.com/getting-started/publishing-npm-packages).
+Add to .gitpod.yml:
+```
+tasks:
+  - init: yarn
+    command: |
+      gp sync-done init
+      yarn --cwd theia-training watch
+  - command: |
+      gp sync-await init
+      yarn --cwd browser-app watch
+    name: Watch browser-app
+    openMode: split-right
+  - command: |
+      gp sync-await init
+      yarn --cwd browser-app start ..
+    name: Run browser-app
+    openMode: tab-after
+```
 
-    npm login
+See https://www.gitpod.io/docs/44_config_start_tasks/
 
-Publish packages with lerna to update versions properly across local packages, [more on publishing with lerna](https://github.com/lerna/lerna#publish).
+##### Start a new workspace
 
-    npx lerna publish
+- Commmit changes
+- Open `exercise-0` branch in Gitpod for your fork.
+- Check that:
+  - The application is already built and running. You should see `Open Browser` notification.
+  - Terminals are configured according to tasks.
