@@ -1,6 +1,6 @@
 # Exercise 6: Style and white-label Theia application
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/akosyakov/theia-training/tree/exercise-6)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/Ron-ZL/theia-training/tree/exercise-6)
 
 In this exercise, you learn:
 - how to customize the default layout;
