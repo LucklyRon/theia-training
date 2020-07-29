@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { injectable, inject } from "inversify";
 import { open, ReactWidget, LabelProvider, Message, OpenerService } from "@theia/core/lib/browser";
+import { StatefulWidget } from "@theia/core/src/browser";
 import { FileSystem, FileStat } from "@theia/filesystem/lib/common";
 import URI from '@theia/core/lib/common/uri';
 
@@ -8,7 +9,7 @@ import URI from '@theia/core/lib/common/uri';
  * BONUS: implement `StatefulWidget` to preserve the path and current state on the page reload
  */
 @injectable()
-export class FileListWidget extends ReactWidget {
+export class FileListWidget extends ReactWidget implements StatefulWidget {
 
     static ID = 'fileList';
 
@@ -21,6 +22,9 @@ export class FileListWidget extends ReactWidget {
     @inject(OpenerService)
     protected readonly openerService: OpenerService;
 
+    protected path: string[] = [];
+    protected current: FileStat | undefined;
+
     constructor() {
         super();
         this.id = FileListWidget.ID;
@@ -31,13 +35,36 @@ export class FileListWidget extends ReactWidget {
         this.node.classList.add('theia-file-list');
     }
 
+    /**
+     * Store the tree state.
+     */
+    storeState(): object {
+        let state: object = {
+            path: this.path, current: this.current
+        };
+        return state;
+    }
+
+    /**
+     * Restore the state.
+     * @param oldState the old state object.
+     */
+    restoreState(oldState: object): void {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { path, current} = (oldState as any);
+        if (path) {
+            this.path = path;
+        }
+        if (current) {
+            this.current = current;
+        }
+    }
+
     protected onActivateRequest(msg: Message): void {
         super.onActivateRequest(msg);
         this.node.focus();
     }
 
-    protected path: string[] = [];
-    protected current: FileStat | undefined;
 
     protected render(): React.ReactNode {
         /* TODO implement rendering
@@ -106,7 +133,10 @@ export class FileComponent extends React.Component<FileComponent.Props> {
         // BONUS: render file icon
         // `LabelProvider.getIcon` provides an icon for the given object
         // but it is async, so the code should be refactored to first compute an icon and then trigger rerendering
-        return <div onClick={this.openFile}>{this.props.labelProvider.getName(this.props.file)}</div>;
+        const icon = this.props.labelProvider.getIcon(new URI(this.props.file.uri));
+        const iconClass = icon === '' ? undefined : icon + ' file-icon';
+
+        return <div className={iconClass + ' file-icon'} onClick={this.openFile}>{this.props.labelProvider.getName(this.props.file)}</div>;
     }
 
     protected readonly openFile = (e: React.MouseEvent<HTMLDivElement>) => {
