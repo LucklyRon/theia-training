@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { injectable, inject } from "inversify";
+import { injectable, inject, postConstruct } from "inversify";
 import { open, ReactWidget, LabelProvider, Message, OpenerService, StatefulWidget } from "@theia/core/lib/browser";
 import URI from '@theia/core/lib/common/uri';
 import { FileListService, Files } from '../common/file-list-protocol';
@@ -32,7 +32,7 @@ export class FileListWidget extends ReactWidget implements StatefulWidget {
 
     static ID = 'fileList';
 
-    // BONUS: render offline mode when FileListService is disconnected
+    // BONUS: render offline when FileListService is disconnected
     // use `JsonRpcProxy<FileListService>` as a type to detect when a connection is closed or opened
     @inject(FileListService)
     protected readonly fileListService: JsonRpcProxy<FileListService>;
@@ -53,6 +53,21 @@ export class FileListWidget extends ReactWidget implements StatefulWidget {
         this.node.classList.add('theia-file-list');
     }
 
+    protected online = true;
+
+    @postConstruct()
+    protected init(): void {
+        this.fileListService.onDidCloseConnection(() => {
+            this.online = false;
+            this.update();
+        })
+        this.fileListService.onDidOpenConnection(() => {
+            this.online = true;
+            this.update();
+        })
+    }
+
+
     protected onActivateRequest(msg: Message): void {
         super.onActivateRequest(msg);
         this.node.focus();
@@ -62,6 +77,9 @@ export class FileListWidget extends ReactWidget implements StatefulWidget {
     protected current: Files & { uri: string } | undefined;
 
     protected render(): React.ReactNode {
+        if (!this.online) {
+            return <div>Offline</div>;
+        }
         const children = this.current && this.current.children;
         return <React.Fragment>
             {this.path.length > 0 && <div onClick={this.openParent}>..</div>}

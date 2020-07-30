@@ -4,4 +4,5 @@
  */
 .theia-file-list > div {
     padding: calc(var(--theia-ui-padding)/2) var(--theia-ui-padding);
+    display:block;
 }
